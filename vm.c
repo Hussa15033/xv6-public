@@ -404,6 +404,11 @@ mprotect(void *addr, int len)
         return -1;
     }
 
+    if (len <= 0) {
+        cprintf("mprotect: length must be greater than 0\n");
+        return -1;
+    }
+
     struct proc * p = myproc();
 
     pde_t * pgdir = p->pgdir;
@@ -442,6 +447,10 @@ munprotect(void *addr, int len)
         return -1;
     }
 
+    if (len <= 0) {
+        cprintf("munprotect: length must be greater than 0\n");
+        return -1;
+    }
     struct proc * p = myproc();
 
     pde_t * pgdir = p->pgdir;
