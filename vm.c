@@ -392,10 +392,39 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
+// Set a given number of pages starting from addr
+// as read-only
 int
 mprotect(void *addr, int len)
 {
-//todo
+
+    // check address is page-aligned
+    if((uint) addr % PGSIZE != 0)
+        return -1;
+
+    struct proc * p = myproc();
+
+    pde_t * pgdir = p->pgdir;
+
+    void * endAddr = addr + (len * PGSIZE);
+
+    if ((uint) addr < p->vbase || (uint) endAddr > PGROUNDDOWN(p->vlimit)) {
+        // Ensure given address is greater than vbase
+        // and the last page address is less than or equal to the last page
+        // available to this process
+        return -1;
+    }
+
+    pte_t *pte;
+    // Loop from address to the appropriate amount of page sizes
+
+    for(void * i = addr; i < endAddr; i += PGSIZE){
+        // Make entry read-only
+        pte = walkpgdir(pgdir, i, 1);
+        *pte = *pte & ~PTE_W;
+    }
+
+    lcr3(V2P(pgdir));
     return 0;
 }
 
