@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         printf(1, "successfully ran mprotect\n");
     }
 
-    // 0x3000 is was not protected
+    // 0x3000 is not protected
     printf(1, "attempting to write to a page that is NOT read-only (should not cause a trap): ");
     int * mem = (int *) 0x3000;
     *mem = 5;
