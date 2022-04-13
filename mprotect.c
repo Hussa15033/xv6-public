@@ -23,6 +23,17 @@ int main(int argc, char *argv[])
     } else {
         printf(1, "success\n");
     }
+    printf(1, "\n");
+
+    // Check mprotect returns -1 for length = 0
+    printf(1, "performing length-check: ");
+    if (mprotect((int *) 0x1000, 0) != -1) {
+        printf(1, "failed\n");
+        exit();
+    } else {
+        printf(1, "success\n");
+    }
+    printf(1, "\n");
 
     // Check mprotect returns -1 for an address below the base of process.
     printf(1, "checking valid address lower-bound check: ");
@@ -32,6 +43,7 @@ int main(int argc, char *argv[])
     } else {
         printf(1, "success\n");
     }
+    printf(1, "\n");
 
     // Check mprotect returns -1 for an address above the process limit (where kernel resides)
     printf(1, "checking valid address upper-bound check: ");
@@ -41,22 +53,26 @@ int main(int argc, char *argv[])
     } else {
         printf(1, "success\n");
     }
+    printf(1, "\n");
 
-    printf(1, "setting %d pages from address: %p to read-only\n", NUMBER_OF_PAGES, START_ADDR);
-
+    printf(1, "setting %d pages from address: 0x%p to read-only\n", NUMBER_OF_PAGES, START_ADDR);
     if (mprotect(START_ADDR, NUMBER_OF_PAGES) != 0) {
         printf(1, "failed running mprotect.");
         exit();
     } else {
         printf(1, "successfully ran mprotect\n");
     }
+    printf(1, "\n");
 
     // 0x3000 is not protected
-    printf(1, "attempting to write to a page that is NOT read-only (should not cause a trap): ");
+    printf(1, "attempting to write to an address that is NOT read-only (should not cause a trap)\n");
     int * mem = (int *) 0x3000;
     *mem = 5;
     printf(1, "success\n");
-    printf(1, "attempting to write to page that is READ-ONLY (should cause a trap)\n");
+
+    printf(1, "\n");
+
+    printf(1, "attempting to write to an address that is READ-ONLY (should cause a trap)\n");
 
     // 0x1000 should be protected
     int * rdonly = (int *) 0x1000;
@@ -64,5 +80,6 @@ int main(int argc, char *argv[])
 
     // If a trap was not caused, mprotect has failed.
     printf(1, "\nFAILED, mprotect did not work.");
+
     exit();
 }
